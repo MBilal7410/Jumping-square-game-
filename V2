@@ -1,0 +1,232 @@
+#this version has an interface, u can restart the game.
+#improved jump algorithm, if you used the last version you would know that the jump feels unnatural 
+import pygame
+from random import randint
+from os import system
+from time import sleep 
+
+pygame.init()
+system("cls")
+win_h = 720
+win_w = 1040
+win = pygame.display.set_mode((win_w,win_h))
+pygame.display.set_caption("game")
+
+print("left click on the game window when it appears")
+print("press space to jump")
+print("game starting in 5 seconds")
+sleep(1)
+print("4")
+sleep(1)
+print("3")
+sleep(1)
+print("2")
+sleep(1)
+print("1")
+sleep(1)
+
+
+
+fps = 30
+vel = 10
+
+floor_height = 600
+
+width=50
+height=50
+x = 150
+y = floor_height - width -3
+
+vely = 0
+jump_c = 10
+jump = False
+
+en_size = 50
+
+en1 = win_w
+en2 = win_w
+en3 = win_w
+enemy1 = False
+enemy2 = False 
+enemy3 = False
+wait = 50
+
+t_font = pygame.font.SysFont("Arial", 40)
+
+
+turns = 3
+score = 0
+
+def reset():
+    global fps
+    global vel 
+    global x
+    global y 
+    global vely 
+    global jump_c 
+    global jump 
+    global en1 
+    global en2 
+    global en3
+    global enemy1 
+    global enemy2 
+    global enemy3
+    global score 
+
+    fps = 30
+    vel = 10
+
+    x = 150
+    y = floor_height - width -3
+
+    vely = 0
+    jump_c = 10
+    jump = False
+    en1 = win_w
+    en2 = win_w
+    en3 = win_w
+    enemy1 = False
+    enemy2 = False 
+    enemy3 = False
+
+    score = 0
+
+
+def draw_text(text, font, col, x, y):
+    img = font.render(text, True, col)
+    win.blit(img, (x,y))
+
+def square_en1(size):
+    global enemy1 
+    global en1
+    if enemy1:
+        pygame.draw.rect(win, (220,20,20), (en1, floor_height - size, size, size))
+        en1 -= vel
+        if en1 <= -size:
+            enemy1 = False
+            en1 = win_w
+def square_en2(size):
+    global enemy2 
+    global en2
+    if enemy2:
+        pygame.draw.rect(win, (220,220,20), (en2, floor_height - size, size, size))
+        en2 -= vel
+        if en2 <= -size:
+            enemy2 = False
+            en2 = win_w
+def square_en3(size):
+    global enemy3 
+    global en3
+    if enemy3:
+        pygame.draw.rect(win, (20,20,220), (en3, floor_height - size, size, size))
+        en3 -= vel
+        if en3 <= -size:
+            enemy3 = False
+            en3 = win_w
+
+
+run = True 
+while run:
+    pygame.time.delay(int(1000/fps))
+    for event in pygame.event.get():
+        if event.type==pygame.QUIT:
+            run = False 
+    
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_SPACE]:
+        jump=True
+    if keys[pygame.K_w]:
+        enemy3 = True
+    if jump==True:
+        # if jump_c>=-10:
+        #     stat = 1
+        #     if jump_c<=0:
+        #         stat = -1
+        #     y -= jump_c**2 * stat *.7
+        #     jump_c-=1
+        # else:
+        #     jump = False
+        #     jump_c = 10
+        if jump_c == 10:
+            vely = 25
+            jump_c-=1
+        elif jump_c < 10 and y<=floor_height - width -3:
+            vely -= 2.3
+            jump_c-=1
+        y-=vely
+        
+        if y>=floor_height - width -3:
+            jump = False
+            jump_c = 10
+            y = floor_height - width -3
+            vely=0
+        
+        
+    
+    
+
+    win.fill((0,0,0))
+    
+    if enemy1 == False and wait<=0:
+        rand1 = randint(0,100)
+        if rand1 == 1:
+            enemy1 = True        
+            wait = 50
+    if enemy2 == False and wait<=0:
+        rand2 = randint(0,100)
+        if rand2 == 1:
+            enemy2 = True
+            wait = 50        
+    if enemy3 == False and wait<=0:
+        rand3 = randint(0,100)
+        if rand3 == 1:
+            enemy3 = True
+            wait = 30        
+    wait-=1
+    #print(int(score)) 
+    
+#collision detection:
+    if (x>=en1-width+3 and not(x>en1+en_size) and y>=floor_height-en_size-height) or (x>=en2-width+3 and not(x>en2+en_size) and y>=floor_height-en_size-height) or (x>=en3-width+3 and not(x>en3+en_size) and y>=floor_height-en_size-height):
+        print("game over")
+        win.fill((0,0,0))
+        pygame.display.update()
+        
+        response = input("restart? (yes/no) click here to asnwer  ")
+        if response == "yes":
+            print("restarting in 5 seconds")
+            print("remember to click on the screen")
+            sleep(5)
+            reset()
+        else:
+            run = False
+    else: 
+        string = "Score: "+str(int(score))
+        square_en1(en_size)
+        square_en2(en_size)
+        square_en3(en_size)
+        draw_text(string, t_font, (220,220,220), 50,40 )
+        pygame.draw.rect(win, (255,255,255), (x,y,width,height))
+        pygame.draw.rect(win, (255,200,200), (0,floor_height, 1100, 500))
+        score += .1         
+    pygame.display.update()
+
+
+    fps+=.02
+
+res = pygame.display.set_mode((win_w,win_h))
+pygame.display.set_caption("game")
+
+run = True
+while run:
+    pygame.time.delay(int(1000/fps))
+    for event in pygame.event.get():
+        if event.type==pygame.QUIT: 
+            run = False
+
+    draw_text("Game Over!", pygame.font.SysFont("Arial", 100), (220,220,220), 250, 250)
+    draw_text("Score: "+str(int(score)), pygame.font.SysFont("Arial", 50, italic=True, bold=True), (220,220,220), 400, 350)
+    
+    
+    pygame.display.update()
+
+pygame.quit()
